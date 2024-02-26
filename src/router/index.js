@@ -76,7 +76,27 @@ export const constantRoutes = [
       }
     ]
   },
-
+  {
+    path: '/users',
+    component: Layout,
+    redirect: '/users/list',
+    name: 'Users',
+    meta: { title: '用户管理', icon: 'el-icon-s-help' },
+    children: [
+      {
+        path: 'list',
+        name: 'list',
+        component: () => import('@/views/users/index'),
+        meta: { title: '用户列表', icon: 'table' }
+      },
+      {
+        path: 'add',
+        name: 'add',
+        component: () => import('@/views/users/add'),
+        meta: { title: '添加用户', icon: 'tree' }
+      }
+    ]
+  },
   {
     path: '/form',
     component: Layout,
