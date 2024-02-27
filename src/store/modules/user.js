@@ -67,6 +67,8 @@ const actions = {
         removeToken() // must remove  token  first
         resetRouter()
         commit('SET_TOKEN', '')
+        commit('SET_NAME', '')
+        commit('SET_AVATAR', '')
         commit('SET_ROLE', '')
         resolve()
       }).catch(error => {
