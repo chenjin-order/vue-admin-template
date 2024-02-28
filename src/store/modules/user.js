@@ -5,7 +5,8 @@ import { resetRouter } from '@/router'
 const state = {
   token: getToken(),
   userName: '',
-  userAvatar: ''
+  userAvatar: '',
+  userRole: ''
 }
 
 const mutations = {
