@@ -1,6 +1,12 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">{{ userRole }}: {{ userName }}</div>
+    <div class="dashboard-text">
+      用户类型:
+      <span v-if="userRole === 'admin'"> 超级管理员 </span>
+      <span v-else-if="userRole === 'editor'"> 普通管理员 </span>
+      <span v-else-if="userRole === 'user'"> 普通用户 </span>
+      <span v-else>未知用户</span>
+    </div>
   </div>
 </template>
 

@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, getInfo, addUser } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -29,7 +29,7 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ userName: username.trim(), userPasswordHash: password }).then(response => {
+      login({ userName: username.trim(), userPassword: password }).then(response => {
         const { data } = response
         commit('SET_TOKEN', data.token)
         setToken(data.token)
@@ -61,6 +61,33 @@ const actions = {
     })
   },
 
+  // add user info
+  addUser({ commit }, addUserInfo) {
+    console.log(addUserInfo)
+    const {
+      userName,
+      userPassword,
+      userAvatar,
+      userEmail,
+      userPhone,
+      userRole
+    } = addUserInfo
+    console.log(addUserInfo)
+    return new Promise((resolve, reject) => {
+      addUser({
+        userName: userName,
+        userPassword: userPassword,
+        userAvatar: userAvatar,
+        userEmail: userEmail,
+        userPhone: userPhone,
+        userRole: userRole
+      }).then(response => {
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
   // user logout
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
