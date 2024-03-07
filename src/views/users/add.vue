@@ -35,7 +35,7 @@
           ref="userAvatar"
           v-model="addUserForm.userAvatar"
           class="avatar-uploader"
-          action="http://localhost:8088/users/upload"
+          action="http://localhost:8080/users/upload"
           :show-file-list="false"
           :on-success="handleAvatarSuccess"
           :before-upload="beforeAvatarUpload"
@@ -80,8 +80,8 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button :loading="loading" type="primary" @click.native.prevent="submitForm">提交</el-button>
-        <el-button @click.native.prevent="resetForm">重置</el-button>
+        <el-button :loading="loading" type="primary" style="width: 100px;" @click.native.prevent="submitForm">提交</el-button>
+        <el-button style="width: 100px;" @click.native.prevent="resetForm">重置</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -95,7 +95,7 @@ export default {
   data() {
     const validateUserName = (rule, value, callback) => {
       if (!validUserName(value)) {
-        callback(new Error('请输入正确的用户名/电子邮箱/手机号码'))
+        callback(new Error('请输入正确的用户名'))
       } else {
         callback()
       }
@@ -128,7 +128,8 @@ export default {
         userAvatar: '',
         userEmail: '',
         userPhone: '',
-        userRole: ''
+        userRole: '',
+        userCreatedAt: ''
       },
       addUserRules: {
         userName: [{ required: true, trigger: 'blur', validator: validateUserName }],
@@ -154,6 +155,16 @@ export default {
     }
   },
   methods: {
+    getLocalISOTime() {
+      const now = new Date()
+      const year = now.getFullYear()
+      const month = String(now.getMonth() + 1).padStart(2, '0') // 月份从0开始，需要+1并补0
+      const date = String(now.getDate()).padStart(2, '0') // 日期补0
+      const hours = String(now.getHours()).padStart(2, '0') // 小时补0
+      const minutes = String(now.getMinutes()).padStart(2, '0') // 分钟补0
+      const seconds = String(now.getSeconds()).padStart(2, '0') // 秒补0
+      return `${year}-${month}-${date}T${hours}:${minutes}:${seconds}`
+    },
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -181,18 +192,57 @@ export default {
       return isJPG && isLt2M
     },
     submitForm() {
-      this.$refs.addUserForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          console.log(this.addUserForm)
-          this.$store.dispatch('user/addUser', this.addUserForm).then(() => {
-            this.loading = false
-          }).catch(() => {
-            this.loading = false
-          })
-        } else {
-          return false
+      this.$confirm('确定提交吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$refs.addUserForm.validate(valid => {
+          if (valid) {
+            this.loading = true
+            this.addUserForm.userCreatedAt = this.getLocalISOTime()
+            this.$store.dispatch('user/addUser', this.addUserForm).then(() => {
+              this.$message({
+                type: 'success',
+                message: '添加成功!'
+              })
+              this.loading = false
+            }).catch(() => {
+              this.loading = false
+            })
+          } else {
+            this.$message.error('提交用户信息错误，请重新输入')
+            return false
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消提交'
+        })
+      })
+    },
+    resetForm() {
+      this.$confirm('确定重置吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$refs.addUserForm.resetFields()
+        this.addUserForm.userAvatar = ''
+        this.imageUrl = ''
+        if (this.imageUrl && typeof URL !== 'undefined' && URL.revokeObjectURL) {
+          URL.revokeObjectURL(this.imageUrl)
         }
+        this.$message({
+          type: 'success',
+          message: '重置成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消重置'
+        })
       })
     }
   }

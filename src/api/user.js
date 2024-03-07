@@ -16,9 +16,33 @@ export function getInfo(token) {
   })
 }
 
+export function deleteUser(userId) {
+  return request({
+    url: '/users/deleteUser',
+    method: 'post',
+    params: { userId }
+  })
+}
+
+export function deleteBatchUser(data) {
+  return request({
+    url: '/users/deleteBatchUser',
+    method: 'post',
+    data
+  })
+}
+
+export function editorUser(data) {
+  return request({
+    url: '/users/editorUser',
+    method: 'post',
+    data
+  })
+}
+
 export function addUser(data) {
   return request({
-    url: '/users/addUser',
+    url: '/users/addUsers',
     method: 'post',
     data
   })

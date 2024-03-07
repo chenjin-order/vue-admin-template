@@ -7,7 +7,8 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="userAvatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
+          <!-- <img :src="getFullImageUrl(userAvatar)" class="user-avatar"> -->
+          <img :src="userAvatar" class="user-avatar">
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
@@ -48,6 +49,11 @@ export default {
     ])
   },
   methods: {
+    // getFullImageUrl(relativePath) {
+    //   const baseUrl = 'http://192.168.216.129:8080/'
+    //   // 构建完整的图片 URL
+    //   return baseUrl + relativePath
+    // },
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
@@ -120,8 +126,10 @@ export default {
 
         .user-avatar {
           cursor: pointer;
-          width: 40px;
-          height: 40px;
+          max-width: 40px;
+          max-height: 40px;
+          width: auto;
+          height: auto;
           border-radius: 10px;
         }
 

@@ -1,4 +1,4 @@
-import { login, logout, getInfo, addUser } from '@/api/user'
+import { login, logout, getInfo, addUser, deleteUser, deleteBatchUser, editorUser } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -60,19 +60,67 @@ const actions = {
       })
     })
   },
+  // delete user info
+  deleteUser({ commit }, userId) {
+    return new Promise((resolve, reject) => {
+      deleteUser(userId).then(() => {
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
 
-  // add user info
-  addUser({ commit }, addUserInfo) {
-    console.log(addUserInfo)
+  // delete batch user
+  deleteBatchUser({ commit }, userIdList) {
+    return new Promise((resolve, reject) => {
+      deleteBatchUser(userIdList).then(() => {
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // editor user info
+  editorUser({ commit }, editorUserInfo) {
     const {
       userName,
       userPassword,
       userAvatar,
       userEmail,
       userPhone,
-      userRole
+      userRole,
+      userUpdatedAt
+    } = editorUserInfo
+    return new Promise((resolve, reject) => {
+      editorUser({
+        userName: userName,
+        userPassword: userPassword,
+        userAvatar: userAvatar,
+        userEmail: userEmail,
+        userPhone: userPhone,
+        userRole: userRole,
+        userUpdatedAt: userUpdatedAt
+      }).then(response => {
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // add user info
+  addUser({ commit }, addUserInfo) {
+    const {
+      userName,
+      userPassword,
+      userAvatar,
+      userEmail,
+      userPhone,
+      userRole,
+      userCreatedAt
     } = addUserInfo
-    console.log(addUserInfo)
     return new Promise((resolve, reject) => {
       addUser({
         userName: userName,
@@ -80,7 +128,8 @@ const actions = {
         userAvatar: userAvatar,
         userEmail: userEmail,
         userPhone: userPhone,
-        userRole: userRole
+        userRole: userRole,
+        userCreatedAt: userCreatedAt
       }).then(response => {
         resolve()
       }).catch(error => {
