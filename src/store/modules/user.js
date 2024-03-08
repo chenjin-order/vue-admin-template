@@ -1,6 +1,7 @@
 import { login, logout, getInfo, addUser, deleteUser, deleteBatchUser, editorUser } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
+import CryptoJS from 'crypto-js'
 
 const state = {
   token: getToken(),
@@ -85,6 +86,7 @@ const actions = {
   // editor user info
   editorUser({ commit }, editorUserInfo) {
     const {
+      userId,
       userName,
       userPassword,
       userAvatar,
@@ -93,10 +95,12 @@ const actions = {
       userRole,
       userUpdatedAt
     } = editorUserInfo
+    const cryptoUserPassword = CryptoJS.SHA256(userPassword).toString()
     return new Promise((resolve, reject) => {
       editorUser({
+        userId: userId,
         userName: userName,
-        userPassword: userPassword,
+        userPassword: cryptoUserPassword,
         userAvatar: userAvatar,
         userEmail: userEmail,
         userPhone: userPhone,
@@ -121,10 +125,11 @@ const actions = {
       userRole,
       userCreatedAt
     } = addUserInfo
+    const cryptoUserPassword = CryptoJS.SHA256(userPassword).toString()
     return new Promise((resolve, reject) => {
       addUser({
         userName: userName,
-        userPassword: userPassword,
+        userPassword: cryptoUserPassword,
         userAvatar: userAvatar,
         userEmail: userEmail,
         userPhone: userPhone,

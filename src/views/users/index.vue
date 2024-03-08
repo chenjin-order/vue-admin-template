@@ -13,14 +13,20 @@
         type="selection"
         width="40"
       />
-      <el-table-column prop="id" label="ID" sortable align="center" width="100">
+      <el-table-column prop="id" label="ID" sortable align="center" width="60">
         <template slot-scope="scope">
           <span style="margin-left: 10px;">{{ scope.row.userId }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="名称" align="center" width="170">
+      <el-table-column prop="name" label="用户名" align="center" width="170">
         <template slot-scope="scope">
           <span style="margin-left: 10px;">{{ scope.row.userName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="name" label="密码" align="center" width="170">
+        <template slot-scope="scope">
+          <!-- <span style="margin-left: 10px;">{{ scope.row.userPassword }}</span> -->
+          <span style="margin-left: 10px;">{{ maskPassword(scope.row.userPassword) }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="avatar" label="头像" align="center" width="170">
@@ -39,12 +45,12 @@
           <span style="margin-left: 10px;">{{ scope.row.userPhone }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="role" label="角色" align="center" width="170">
+      <el-table-column prop="role" label="角色" align="center" width="70">
         <template slot-scope="scope">
           <span style="margin-left: 10px;">{{ scope.row.userRole }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" align="center" width="240">
+      <el-table-column prop="createTime" label="创建时间" align="center" width="210">
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span style="margin-left: 10px;">{{ scope.row.userCreatedAt }}</span>
@@ -66,7 +72,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog title="编辑用户" :visible.sync="dialogFormVisible">
+    <el-dialog title="编辑用户" :visible.sync="dialogFormVisible" :before-close="handleClose">
       <el-form ref="editorUserForm" :model="editorUserForm" :rules="addUserRules" class="addUser-form" autocomplete="on" label-position="top">
         <el-form-item label="用户名" prop="userName">
           <el-input
@@ -80,6 +86,22 @@
             tabindex="1"
             style="width: 60%;"
           />
+        </el-form-item>
+        <el-form-item label="密码" prop="userPassword">
+          <el-input
+            :key="passwordType"
+            ref="userPassword"
+            v-model="editorUserForm.userPassword"
+            :type="passwordType"
+            prefix-icon="el-icon-key"
+            autocomplete="off"
+            placeholder="请输入密码"
+            tabindex="2"
+            style="width: 60%;"
+          />
+          <span class="show-pwd" style="" @click="showPwd">
+            <svg-icon :icon-class="passwordType === 'userPassword' ? 'eye' : 'eye-open'" />
+          </span>
         </el-form-item>
         <el-form-item label="头像" prop="userAvatar">
           <el-upload
@@ -195,7 +217,9 @@ export default ({
       dialogFormVisible: false,
       formLabelWidth: '120px',
       editorUserForm: {
+        userId: '',
         userName: '',
+        userPassword: '',
         userAvatar: '',
         userEmail: '',
         userPhone: '',
@@ -261,7 +285,7 @@ export default ({
       })
     },
     handleEdit(index, row) {
-      console.log(row.userAvatar)
+      console.log(row.userId)
       this.editorUserForm = { ...row }
       this.imageUrl = row.userAvatar
       this.loadingEditor = true
@@ -340,6 +364,20 @@ export default ({
       const minutes = String(now.getMinutes()).padStart(2, '0') // 分钟补0
       const seconds = String(now.getSeconds()).padStart(2, '0') // 秒补0
       return `${year}-${month}-${date}T${hours}:${minutes}:${seconds}`
+    },
+    handleClose(done) {
+      this.$confirm('确认关闭？', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消'
+      })
+        .then(_ => {
+          done()
+          this.loadingEditor = false
+        })
+        .catch(_ => {})
+    },
+    maskPassword(password) {
+      return Array(this.fixedMaskLength).fill('••••••••••').join('')
     },
     showPwd() {
       if (this.passwordType === 'password') {
