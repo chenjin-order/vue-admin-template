@@ -49,7 +49,7 @@
 
 <script>
 import { validUserName, validUserEmail, validUserPhone } from '@/utils/validate'
-
+import { mapGetters } from 'vuex'
 export default {
   name: 'Login',
   data() {
@@ -81,6 +81,12 @@ export default {
       redirect: undefined
     }
   },
+  computed: {
+    ...mapGetters([
+      'userName',
+      'userRole'
+    ])
+  },
   watch: {
     $route: {
       handler: function(route) {
@@ -100,12 +106,29 @@ export default {
         this.$refs.password.focus()
       })
     },
+    // handleLogin() {
+    //   this.$refs.loginForm.validate(valid => {
+    //     if (valid) {
+    //       this.loading = true
+    //       this.$store.dispatch('user/login', this.loginForm).then((res) => {
+    //         this.$router.push({ path: this.redirect || '/' })
+    //         this.loading = false
+    //       }).catch(() => {
+    //         this.loading = false
+    //       })
+    //     } else {
+    //       console.log('error submit!!')
+    //       return false
+    //     }
+    //   })
+    // }
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
+          this.$store.dispatch('user/login', this.loginForm).then((res) => {
+            const redirectPath = this.userRole === 'user' ? '/homepage' : this.redirect || '/'
+            this.$router.push({ path: redirectPath })
             this.loading = false
           }).catch(() => {
             this.loading = false
@@ -116,6 +139,93 @@ export default {
         }
       })
     }
+    // handleLogin() {
+    //   this.$refs.loginForm.validate(valid => {
+    //     if (valid) {
+    //       this.loading = true
+    //       this.$store.dispatch('user/login', this.loginForm).then(() => {
+    //         // this.$router.push({ path: this.redirect || '/homepage' })
+    //         this.$store.dispatch('user/getInfo').then((res) => {
+    //           if (res.userInfo.userRole === 'user') {
+    //             this.$router.push({ path: '/homepage' })
+    //           } else {
+    //             // this.$router.push({ path: this.redirect || '/' })
+    //             this.$router.push({ path: '/' })
+    //           }
+    //           console.log(this.redirect)
+    //         }).catch(() => {
+    //           this.loading = false
+    //         })
+    //         this.loading = false
+    //       }).catch(() => {
+    //         this.loading = false
+    //       })
+    //     } else {
+    //       console.log('error submit!!')
+    //       return false
+    //     }
+    //   })
+    // }
+    // handleLogin() {
+    //   this.$refs.loginForm.validate(valid => {
+    //     if (valid) {
+    //       this.loading = true
+    //       this.$store.dispatch('user/login', this.loginForm).then(() => {
+    //         // 登录成功后，获取用户信息
+    //         this.$store.dispatch('user/getInfo').then((res) => {
+    //           // 根据userRole判断跳转路由
+    //           const { userRole } = res.userInfo
+    //           const redirectPath = userRole === 'user' ? '/homepage' : this.redirect || '/'
+    //           this.$router.push({ path: redirectPath })
+    //           console.log(userRole)
+    //           this.loading = false
+    //         }).catch(() => {
+    //           // 获取用户信息失败的处理
+    //           console.error('Error fetching user info')
+    //           this.loading = false
+    //         })
+    //       }).catch(() => {
+    //         // 登录失败的处理
+    //         this.loading = false
+    //       })
+    //     } else {
+    //       console.log('error submit!!')
+    //       return false
+    //     }
+    //   })
+    // }
+    // async handleLogin() {
+    //   try {
+    //     // 验证表单
+    //     if (!(await this.$refs.loginForm.validate())) {
+    //       console.log('error submit!!')
+    //       return
+    //     }
+
+    //     this.loading = true
+
+    //     // 发送登录请求
+    //     await this.$store.dispatch('user/login', this.loginForm)
+
+    //     // 获取用户信息
+    //     const userInfo = await this.$store.dispatch('user/getInfo')
+
+    //     // 根据用户角色重定向
+    //     if (userInfo.userRole === 'user') {
+    //       this.$router.push({ path: '/homepage' })
+    //     } else {
+    //       this.$router.push({ path: this.redirect || '/' })
+    //     }
+
+    //     console.log(userInfo.userRole)
+    //   } catch (error) {
+    //     // 处理错误
+    //     console.error('Login failed:', error)
+    //   } finally {
+    //     // 无论成功还是失败，都设置加载状态为 false
+    //     this.loading = false
+    //   }
+    // }
   }
 }
 </script>

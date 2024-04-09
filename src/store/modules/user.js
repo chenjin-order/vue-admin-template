@@ -33,6 +33,7 @@ const actions = {
       login({ userName: username.trim(), userPassword: password }).then(response => {
         const { data } = response
         commit('SET_TOKEN', data.token)
+        commit('SET_ROLE', data.userRole)
         setToken(data.token)
         resolve()
       }).catch(error => {
@@ -61,6 +62,7 @@ const actions = {
       })
     })
   },
+
   // delete user info
   deleteUser({ commit }, userId) {
     return new Promise((resolve, reject) => {

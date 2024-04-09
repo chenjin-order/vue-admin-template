@@ -1,5 +1,8 @@
 <template>
   <div class="app-container">
+    <el-input v-model="queryKeyword" placeholder="请输入查询关键字" style="width: 200px;margin-right: 20px;" />
+    <el-button :loading="loadingUserSearch" type="primary" style="width: 100px;" @click.native.prevent="userSearch">查询</el-button>
+    <el-button :loading="loadingUserSearchAll" type="primary" style="width: 100px;" @click.native.prevent="userSearchAll">查询全部</el-button>
     <el-table
       ref="multipleTable"
       :data="tableData"
@@ -45,7 +48,7 @@
           <span style="margin-left: 10px;">{{ scope.row.userPhone }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="role" label="角色" align="center" width="70">
+      <el-table-column prop="role" label="角色" align="center" width="170">
         <template slot-scope="scope">
           <span style="margin-left: 10px;">{{ scope.row.userRole }}</span>
         </template>
@@ -56,7 +59,13 @@
           <span style="margin-left: 10px;">{{ scope.row.userCreatedAt }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="operate" label="操作" align="center" width="184">
+      <el-table-column prop="createTime" label="更新时间" align="center" width="210">
+        <template slot-scope="scope">
+          <i class="el-icon-time" />
+          <span style="margin-left: 10px;">{{ scope.row.userUpdatedAt }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column fixed="right" prop="operate" label="操作" align="center" width="184">
         <template slot-scope="scope">
           <el-button
             :loading="loadingEditor"
@@ -73,7 +82,7 @@
       </el-table-column>
     </el-table>
     <el-dialog title="编辑用户" :visible.sync="dialogFormVisible" :before-close="handleClose">
-      <el-form ref="editorUserForm" :model="editorUserForm" :rules="addUserRules" class="addUser-form" autocomplete="on" label-position="top">
+      <el-form ref="editorUserForm" :model="editorUserForm" :rules="editorUserRules" class="addUser-form" autocomplete="on" label-position="top">
         <el-form-item label="用户名" prop="userName">
           <el-input
             ref="userName"
@@ -143,7 +152,7 @@
           />
         </el-form-item>
         <el-form-item label="角色" prop="userRole">
-          <el-select v-model="editorUserForm.userRole" placeholder="请选择角色" tabindex="6">
+          <el-select ref="userRole" v-model="editorUserForm.userRole" placeholder="请选择角色" tabindex="6">
             <el-option
               v-for="item in options"
               :key="item.userRole"
@@ -153,9 +162,9 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button :loading="loadingEditorUser" type="primary" style="width: 100px;" @click.native.prevent="submitForm">提交</el-button>
-          <el-button style="width: 100px;" @click.native.prevent="resetForm">重置</el-button>
-          <el-button @click="cancelEditor">取消编辑</el-button>
+          <el-button :loading="loadingEditorSubmit" type="primary" style="width: 100px;" @click.native.prevent="submitForm">提交</el-button>
+          <el-button :loading="loadingEditorReset" style="width: 100px;" @click.native.prevent="resetForm">重置</el-button>
+          <el-button :loading="loadingEditorCancel" @click="cancelEditor">取消编辑</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -165,11 +174,12 @@
       layout="prev, pager, next"
       :page-size="pageSize"
       :total="total"
+      :current-page="currentPage"
       @current-change="changePage"
     />
     <div class="bottom" style="display: flex;justify-content: flex-end;width: 99%;">
       <el-button
-        :loading="loadingDelete"
+        :loading="loadingBatchDelete"
         type="danger"
         @click="handleBatchDelete"
       >批量删除</el-button>
@@ -204,18 +214,22 @@ export default ({
       }
     }
     return {
+      queryKeyword: '',
       currentPage: 1,
       total: 1,
       pageSize: 1,
       isShow: false,
       loadingEditor: false,
-      loadingEditorUser: false,
+      loadingEditorSubmit: false,
+      loadingEditorReset: false,
+      loadingEditorCancel: false,
       loadingDelete: false,
       loadingBatchDelete: false,
+      loadingUserSearch: false,
+      loadingUserSearchAll: false,
       tableData: [],
       multipleSelection: [],
       dialogFormVisible: false,
-      formLabelWidth: '120px',
       editorUserForm: {
         userId: '',
         userName: '',
@@ -226,7 +240,17 @@ export default ({
         userRole: '',
         userUpdatedAt: ''
       },
-      addUserRules: {
+      initialEditorUserForm: {
+        userId: '',
+        userName: '',
+        userPassword: '',
+        userAvatar: '',
+        userEmail: '',
+        userPhone: '',
+        userRole: '',
+        userUpdatedAt: ''
+      },
+      editorUserRules: {
         userName: [{ required: true, trigger: 'blur', validator: validateUserName }],
         userEmail: [{ required: true, trigger: 'blur', validator: validateUserEmail }],
         userPhone: [{ required: true, trigger: 'blur', validator: validateUserPhone }]
@@ -243,7 +267,6 @@ export default ({
       }
       ],
       imageUrl: '',
-      loading: false,
       passwordType: 'password',
       redirect: undefined
     }
@@ -258,7 +281,21 @@ export default ({
   },
   created: function() {
     userList().then((response) => {
-      this.tableData = response.data.items.records
+      // this.tableData = response.data.items.records
+      // const isoString = this.tableData.userCreatedAt
+      // this.tableData.userCreatedAt = new Date(this.tableData.userCreatedAt)
+      const newUsers = response.data.items.records.map(users => {
+        const newUser = { ...users }
+        // //  ISO 字符串转换为 Date 对象
+        // const date = new Date(newUser.userCreatedAt)
+        // // 原生 JavaScript 方法进行格式化Date
+        // newUser.userCreatedAt = this.formatDateWithSeconds(date)
+        // // newUser.userCreatedAt = new Date(newUser.userCreatedAt)
+        newUser.userCreatedAt = this.formatDateWithSeconds(new Date(newUser.userCreatedAt))
+        newUser.userUpdatedAt = this.formatDateWithSeconds(new Date(newUser.userUpdatedAt))
+        return newUser
+      })
+      this.tableData = newUsers
 
       this.total = response.data.items.total
 
@@ -273,68 +310,78 @@ export default ({
     //   // 构建完整的图片 URL
     //   return baseUrl + relativePath
     // },
+    formatDateWithSeconds(date) {
+      const year = date.getFullYear()
+      const month = ('0' + (date.getMonth() + 1)).slice(-2)
+      const day = ('0' + date.getDate()).slice(-2)
+      const hours = ('0' + date.getHours()).slice(-2)
+      const minutes = ('0' + date.getMinutes()).slice(-2)
+      const seconds = ('0' + date.getSeconds()).slice(-2)
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+    },
+    userSearch() {
+      this.loadingUserSearch = true
+      if (this.queryKeyword) {
+        userList(this.currentPage, this.queryKeyword).then((response) => {
+          this.tableData = response.data.items.records
+          this.total = response.data.items.total
+          this.pageSize = response.data.items.size
+        })
+        this.$message({
+          type: 'success',
+          message: '查询成功!'
+        })
+        this.loadingUserSearch = false
+      } else {
+        this.loadingUserSearch = false
+        this.$message({
+          type: 'error',
+          message: '查询条件不能为空'
+        })
+      }
+    },
+    userSearchAll() {
+      this.loadingUserSearchAll = true
+      userList().then((response) => {
+        this.tableData = response.data.items.records
+        this.total = response.data.items.total
+        this.pageSize = response.data.items.size
+        this.queryKeyword = ''
+        this.currentPage = 1
+        this.$message({
+          type: 'success',
+          message: '查询成功!'
+        })
+      }).finally(() => {
+        this.loadingUserSearchAll = false
+      })
+    },
     handleSelectionChange(val) {
       this.multipleSelection = val
     },
-    changePage(pageNum) {
-      if (pageNum) {
-        this.currentPage = pageNum
+    changePage(userPageNum) {
+      if (userPageNum) {
+        this.currentPage = userPageNum
       }
-      userList(this.currentPage).then((response) => {
+      userList(this.currentPage, this.queryKeyword).then((response) => {
         this.tableData = response.data.items.records
       })
     },
     handleEdit(index, row) {
-      console.log(row.userId)
       this.editorUserForm = { ...row }
       this.imageUrl = row.userAvatar
       this.loadingEditor = true
       this.dialogFormVisible = true
+      this.initialEditorUserForm = { ...this.editorUserForm }
     },
     handleDelete(index, row) {
+      this.loadingDelete = true
       this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.loadingDelete = true
         this.$store.dispatch('user/deleteUser', row.userId).then(() => {
-          this.loadingDelete = false
-          this.changePage()
-        }).catch(() => {
-          this.$message({
-            type: 'error',
-            message: '删除失败!'
-          })
-          this.loading = false
-        })
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        })
-      })
-    },
-    handleBatchDelete() {
-      const userIdList = this.multipleSelection.map(item => item.userId)
-      if (userIdList.length === 0) {
-        this.$message({
-          type: 'error',
-          message: '请先选择要删除的用户!'
-        })
-        return
-      }
-      this.$alert('此操作将永久删除用户信息, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.loadingBatchDelete = true
-        this.$store.dispatch('user/deleteBatchUser', userIdList).then(() => {
           this.$message({
             type: 'success',
             message: '删除成功!'
@@ -353,6 +400,46 @@ export default ({
           type: 'info',
           message: '已取消删除'
         })
+        this.loadingDelete = false
+      })
+    },
+    handleBatchDelete() {
+      const userIdList = this.multipleSelection.map(item => item.userId)
+      this.loadingBatchDelete = true
+      if (userIdList.length === 0) {
+        this.$message({
+          type: 'error',
+          message: '请先选择要删除的用户!'
+        })
+        this.loadingBatchDelete = false
+        return
+      }
+      this.$alert('此操作将永久删除用户信息, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.loadingBatchDelete = true
+        this.$store.dispatch('user/deleteBatchUser', userIdList).then(() => {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.loadingBatchDelete = false
+          this.changePage()
+        }).catch(() => {
+          this.$message({
+            type: 'error',
+            message: '删除失败!'
+          })
+          this.loadingBatchDelete = false
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+        this.loadingBatchDelete = false
       })
     },
     getLocalISOTime() {
@@ -372,6 +459,10 @@ export default ({
       })
         .then(_ => {
           done()
+          this.$message({
+            type: 'info',
+            message: '已取消编辑'
+          })
           this.loadingEditor = false
         })
         .catch(_ => {})
@@ -406,29 +497,31 @@ export default ({
       return isJPG && isLt2M
     },
     submitForm() {
+      this.loadingEditorSubmit = true
       this.$confirm('确认提交吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.loadingEditorUser = true
         this.$refs.editorUserForm.validate(valid => {
           if (valid) {
-            this.loading = true
             this.editorUserForm.userUpdatedAt = this.getLocalISOTime()
             this.$store.dispatch('user/editorUser', this.editorUserForm).then(() => {
               this.$message({
                 type: 'success',
                 message: '提交成功!'
               })
-              this.loadingEditorUser = false
+              this.loadingEditorSubmit = false
+              this.dialogFormVisible = false
               this.loadingEditor = false
+              this.changePage()
             }).catch(() => {
               this.$message.error('提交失败')
-              this.loadingEditorUser = false
-              this.loadingEditor = false
+              this.loadingEditorSubmit = false
             })
           } else {
+            this.$message.error('提交用户信息错误，请重新输入')
+            this.loadingEditorSubmit = false
             return false
           }
         })
@@ -437,11 +530,11 @@ export default ({
           type: 'info',
           message: '已取消提交'
         })
-        this.loadingEditorUser = false
-        this.loadingEditor = false
+        this.loadingEditorSubmit = false
       })
     },
     resetForm() {
+      this.loadingEditorReset = true
       this.$confirm('确定重置吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -449,7 +542,7 @@ export default ({
       }).then(() => {
         this.$refs.editorUserForm.resetFields()
         this.editorUserForm.userAvatar = ''
-        this.imageUrl = ''
+        this.imageUrl = this.initialEditorUserForm.userAvatar
         if (this.imageUrl && typeof URL !== 'undefined' && URL.revokeObjectURL) {
           URL.revokeObjectURL(this.imageUrl)
         }
@@ -457,14 +550,17 @@ export default ({
           type: 'success',
           message: '重置成功!'
         })
+        this.loadingEditorReset = false
       }).catch(() => {
         this.$message({
           type: 'info',
           message: '已取消重置'
         })
+        this.loadingEditorReset = false
       })
     },
     cancelEditor() {
+      this.loadingEditorCancel = true
       this.$confirm('确定取消编辑?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -472,6 +568,7 @@ export default ({
       }).then(() => {
         this.dialogFormVisible = false
         this.loadingEditor = false
+        this.loadingEditorCancel = false
         this.$message({
           type: 'info',
           message: '已取消编辑'

@@ -35,13 +35,13 @@
           ref="userAvatar"
           v-model="addUserForm.userAvatar"
           class="avatar-uploader"
-          action="http://localhost:8080/users/upload"
+          action="http://localhost:8080/upload/uploadUserAvatar"
           :show-file-list="false"
           :on-success="handleAvatarSuccess"
           :before-upload="beforeAvatarUpload"
           name="userAvatar"
         >
-          <img v-if="imageUrl" :src="imageUrl" class="avatar">
+          <img v-if="imageUrl" :src="imageUrl" class="userAvatar">
           <i v-else class="el-icon-plus avatar-uploader-icon" />
         </el-upload>
       </el-form-item>
@@ -70,7 +70,7 @@
         />
       </el-form-item>
       <el-form-item label="角色" prop="userRole">
-        <el-select v-model="addUserForm.userRole" placeholder="请选择角色" tabindex="6">
+        <el-select ref="userRole" v-model="addUserForm.userRole" placeholder="请选择角色" tabindex="6">
           <el-option
             v-for="item in options"
             :key="item.userRole"
@@ -81,7 +81,7 @@
       </el-form-item>
       <el-form-item>
         <el-button :loading="loading" type="primary" style="width: 100px;" @click.native.prevent="submitForm">提交</el-button>
-        <el-button style="width: 100px;" @click.native.prevent="resetForm">重置</el-button>
+        <el-button :loading="loadingReset" style="width: 100px;" @click.native.prevent="resetForm">重置</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -150,6 +150,7 @@ export default {
       ],
       imageUrl: '',
       loading: false,
+      loadingReset: false,
       passwordType: 'password',
       redirect: undefined
     }
@@ -178,13 +179,14 @@ export default {
     handleAvatarSuccess(res, file) {
       this.addUserForm.userAvatar = file.response.data.userAvatar
       this.imageUrl = URL.createObjectURL(file.raw)
+      // this.imageUrl = 'http://192.168.216.129:8080/' + file.response.data.userAvatar
     },
     beforeAvatarUpload(file) {
-      const isJPG = file.type === 'image/jpeg'
+      const isJPG = file.type === 'image/jpeg' || file.type === 'image/jpg'
       const isLt2M = file.size / 1024 / 1024 < 2
 
       if (!isJPG) {
-        this.$message.error('上传头像图片只能是 JPG 格式!')
+        this.$message.error('上传头像图片只能是 JPEG或JRG 格式!')
       }
       if (!isLt2M) {
         this.$message.error('上传头像图片大小不能超过 2MB!')
@@ -192,6 +194,7 @@ export default {
       return isJPG && isLt2M
     },
     submitForm() {
+      this.loading = true
       this.$confirm('确定提交吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -199,7 +202,6 @@ export default {
       }).then(() => {
         this.$refs.addUserForm.validate(valid => {
           if (valid) {
-            this.loading = true
             this.addUserForm.userCreatedAt = this.getLocalISOTime()
             this.$store.dispatch('user/addUser', this.addUserForm).then(() => {
               this.$message({
@@ -212,6 +214,7 @@ export default {
             })
           } else {
             this.$message.error('提交用户信息错误，请重新输入')
+            this.loading = false
             return false
           }
         })
@@ -220,9 +223,11 @@ export default {
           type: 'info',
           message: '已取消提交'
         })
+        this.loading = false
       })
     },
     resetForm() {
+      this.loadingReset = true
       this.$confirm('确定重置吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -238,11 +243,13 @@ export default {
           type: 'success',
           message: '重置成功!'
         })
+        this.loadingReset = false
       }).catch(() => {
         this.$message({
           type: 'info',
           message: '已取消重置'
         })
+        this.loadingReset = false
       })
     }
   }
@@ -276,7 +283,7 @@ export default {
     line-height: 178px;
     text-align: center;
   }
-  .avatar {
+  .userAvatar {
     width: 178px;
     height: 178px;
     display: block;

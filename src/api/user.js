@@ -16,6 +16,13 @@ export function getInfo(token) {
   })
 }
 
+export function getUsers() {
+  return request({
+    url: '/users/getUsers',
+    method: 'get'
+  })
+}
+
 export function deleteUser(userId) {
   return request({
     url: '/users/deleteUser',
@@ -55,10 +62,17 @@ export function logout() {
   })
 }
 
-export function userList(pageNum) {
+export function userList(userPageNum, queryKeyword) {
   return request({
     url: '/users/all',
     method: 'get',
-    params: { pageNum }
+    params: { userPageNum, queryKeyword }
+  })
+}
+
+export function getUserCounts() {
+  return request({
+    url: '/users/getUserCounts',
+    method: 'get'
   })
 }
