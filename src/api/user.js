@@ -8,6 +8,14 @@ export function login(data) {
   })
 }
 
+export function signup(data) {
+  return request({
+    url: '/users/signup',
+    method: 'post',
+    data
+  })
+}
+
 export function getInfo(token) {
   return request({
     url: '/users/info',
@@ -74,5 +82,61 @@ export function getUserCounts() {
   return request({
     url: '/users/getUserCounts',
     method: 'get'
+  })
+}
+
+export function getFavoriteArticlesCount(userName) {
+  return request({
+    url: '/user-favorite-articles/getFavoriteArticlesCount',
+    method: 'post',
+    params: { userName }
+  })
+}
+
+export function getFollowedDisastersCount(userName) {
+  return request({
+    url: '/user-followed-disasters/getFollowedDisastersCount',
+    method: 'post',
+    params: { userName }
+  })
+}
+
+export function getUserFavoriteArticles(userName, userFavoriteArticlesPageNum) {
+  return request({
+    url: '/user-favorite-articles/getUserFavoriteArticles',
+    method: 'get',
+    params: { userName, userFavoriteArticlesPageNum }
+  })
+}
+
+export function getUserInfo(token) {
+  return request({
+    url: '/users/getUserInfo',
+    method: 'get',
+    params: { token }
+  })
+}
+
+export function updatePhone(data) {
+  return request({
+    url: '/users/updatePhone',
+    method: 'post',
+    data
+  })
+}
+
+export function updateEmail(data) {
+  return request({
+    url: '/users/updateEmail',
+    method: 'post',
+    data
+  })
+}
+
+export function updatePW(data) {
+  return request({
+    url: '/users/updatePW',
+    method: 'post',
+    data
   })
 }

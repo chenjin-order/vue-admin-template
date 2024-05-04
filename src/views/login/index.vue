@@ -6,15 +6,15 @@
         <h3 class="title">登录</h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="account">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="username"
-          v-model="loginForm.username"
+          ref="account"
+          v-model="loginForm.account"
           placeholder="用户名/电子邮箱/手机号码"
-          name="username"
+          name="account"
           type="text"
           tabindex="1"
           auto-complete="on"
@@ -40,8 +40,10 @@
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
-
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <span style="color: white;">还没有账号？</span><el-button type="text" @click.native.prevent="signup">注册</el-button>
+      <br>
+      <br>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
 
     </el-form>
   </div>
@@ -69,11 +71,11 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: 'admin123'
+        account: 'default',
+        password: '123456789'
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        account: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       loading: false,
@@ -126,7 +128,11 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then((res) => {
+          const loginForm = {
+            account: this.loginForm.account,
+            userPassword: this.loginForm.password
+          }
+          this.$store.dispatch('user/login', loginForm).then((res) => {
             const redirectPath = this.userRole === 'user' ? '/homepage' : this.redirect || '/'
             this.$router.push({ path: redirectPath })
             this.loading = false
@@ -138,6 +144,9 @@ export default {
           return false
         }
       })
+    },
+    async signup() {
+      this.$router.push(`/signup`)
     }
     // handleLogin() {
     //   this.$refs.loginForm.validate(valid => {

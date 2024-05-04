@@ -53,3 +53,11 @@ export function getResponseCounts() {
     method: 'get'
   })
 }
+
+export function getResponseDetail(eventId) {
+  return request({
+    url: '/disaster-responses/getResponseDetail',
+    method: 'get',
+    params: { eventId }
+  })
+}

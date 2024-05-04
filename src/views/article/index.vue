@@ -158,8 +158,8 @@
 </template>
 <script>
 import Editor from '@tinymce/tinymce-vue'
-import { getArticleInfo } from '@/api/article'
-import { getArticleCategories } from '@/api/article'
+// import { getArticleInfo } from '@/api/article'
+import { getArticleCategories, getArticleInfo } from '@/api/article'
 import { getUsers } from '@/api/user'
 export default ({
   components: {

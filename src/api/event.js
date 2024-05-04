@@ -61,9 +61,39 @@ export function getEventCounts() {
   })
 }
 
-export function getEventYear() {
+export function getEventWeek() {
   return request({
-    url: '/disaster-events/getEventYear',
+    url: '/disaster-events/getEventWeek',
     method: 'get'
+  })
+}
+
+export function getEventPageInfo() {
+  return request({
+    url: '/disaster-events/getEventPageInfo',
+    method: 'get'
+  })
+}
+
+export function getEventTypeCount() {
+  return request({
+    url: '/disaster-events/getEventTypeCount',
+    method: 'get'
+  })
+}
+
+export function getEventDetailById(eventId) {
+  return request({
+    url: '/disaster-events/getEventDetailById',
+    method: 'get',
+    params: { eventId }
+  })
+}
+
+export function getHomeEventInfo(homeEventPageNum) {
+  return request({
+    url: '/disaster-events/getHomeEventInfo',
+    method: 'get',
+    params: { homeEventPageNum }
   })
 }

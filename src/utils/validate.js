@@ -19,7 +19,7 @@ export function validUserName(str) {
   const trimmedStr = str.trim()
 
   // 验证用户名规则：仅支持中英文、数字和下划线，且不能为纯数字
-  const isUserNameValid = /^[a-zA-Z0-9_\u4e00-\u9fa5]+$/.test(trimmedStr) && !/^\d+$/.test(trimmedStr)
+  const isUserNameValid = /^[a-zA-Z0-9_\u4e00-\u9fa5 ]+$/.test(trimmedStr) && !/^\d+$/.test(trimmedStr)
 
   // 如果用户名验证通过，则返回 true，否则返回 false
   return isUserNameValid

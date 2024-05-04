@@ -1,4 +1,17 @@
-import { login, logout, getInfo, addUser, deleteUser, deleteBatchUser, editorUser } from '@/api/user'
+import {
+  login,
+  logout,
+  getInfo,
+  addUser,
+  deleteUser,
+  deleteBatchUser,
+  editorUser,
+  signup,
+  getUserInfo,
+  updatePhone,
+  updateEmail,
+  updatePW
+} from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 import CryptoJS from 'crypto-js'
@@ -28,13 +41,55 @@ const mutations = {
 const actions = {
   // user login
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ userName: username.trim(), userPassword: password }).then(response => {
+      login(userInfo).then(response => {
         const { data } = response
         commit('SET_TOKEN', data.token)
         commit('SET_ROLE', data.userRole)
         setToken(data.token)
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // remove
+  remove({ commit, state }) {
+    return new Promise((resolve, reject) => {
+      logout(state.token).then(() => {
+        removeToken() // must remove  token  first
+        resetRouter()
+        commit('SET_TOKEN', '')
+        commit('SET_NAME', '')
+        commit('SET_AVATAR', '')
+        commit('SET_ROLE', '')
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // user signup
+  signup({ commit }, userInfo) {
+    const { username, userPhone, userEmail, userAvatar, password, userCreatedAt, userRole } = userInfo
+    return new Promise((resolve, reject) => {
+      signup({
+        userName: username.trim(),
+        userPhone: userPhone,
+        userEmail: userEmail,
+        userAvatar: userAvatar,
+        userPassword: password,
+        userRole: userRole,
+        userCreatedAt: userCreatedAt
+      }).then(response => {
+        removeToken() // must remove  token  first
+        resetRouter()
+        commit('SET_TOKEN', '')
+        commit('SET_NAME', '')
+        commit('SET_AVATAR', '')
+        commit('SET_ROLE', '')
         resolve()
       }).catch(error => {
         reject(error)
@@ -56,6 +111,21 @@ const actions = {
         commit('SET_NAME', userName)
         commit('SET_AVATAR', userAvatar)
         commit('SET_ROLE', userRole)
+        resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // get settings user info
+  getUserInfo({ commit, state }) {
+    return new Promise((resolve, reject) => {
+      getUserInfo(state.token).then(response => {
+        const { data } = response
+        if (!data) {
+          return reject('getUserInfo failed')
+        }
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -150,7 +220,6 @@ const actions = {
       logout(state.token).then(() => {
         removeToken() // must remove  token  first
         resetRouter()
-        commit('SET_TOKEN', '')
         commit('SET_NAME', '')
         commit('SET_AVATAR', '')
         commit('SET_ROLE', '')
@@ -168,6 +237,40 @@ const actions = {
       commit('SET_ROLE', '')
       removeToken() // must remove  token  first
       resolve()
+    })
+  },
+
+  // update phone
+  updatePhone({ commit }, phoneForm) {
+    return new Promise((resolve, reject) => {
+      updatePhone(phoneForm).then(response => {
+        resolve(response)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // update email
+  updateEmail({ commit }, emailForm) {
+    return new Promise((resolve, reject) => {
+      updateEmail(emailForm).then(response => {
+        resolve(response)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // update pw
+  updatePW({ commit }, pwForm) {
+    return new Promise((resolve, reject) => {
+      console.log(pwForm)
+      updatePW(pwForm).then(response => {
+        resolve(response)
+      }).catch(error => {
+        reject(error)
+      })
     })
   }
 }

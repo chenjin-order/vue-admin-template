@@ -79,7 +79,7 @@ import { mapGetters } from 'vuex'
 import * as echarts from 'echarts'
 import { getUserCounts } from '@/api/user'
 import { getArticleCounts, getCategoryCounts } from '@/api/article'
-import { getEventCounts, getEventYear } from '@/api/event'
+import { getEventCounts, getEventWeek } from '@/api/event'
 import { getResponseCounts } from '@/api/response'
 import countTo from 'vue-count-to'
 export default {
@@ -95,7 +95,7 @@ export default {
       eventCounts: null,
       responseCounts: null,
       categoryCounts: [],
-      eventsYearDtoList: []
+      eventWeekVoList: []
       // dataArray: []
     }
   },
@@ -113,7 +113,7 @@ export default {
     this.getCategoryCounts().then(() => {
       this.initPieChart()
     })
-    this.getEventYear().then(() => {
+    this.getEventWeek().then(() => {
       this.initLineChart()
     })
     // this.initLineChart()
@@ -149,9 +149,9 @@ export default {
         // }))
       })
     },
-    getEventYear() {
-      return getEventYear().then((response) => {
-        this.eventsYearDtoList = response.data.eventsYearDtoList
+    getEventWeek() {
+      return getEventWeek().then((response) => {
+        this.eventWeekVoList = response.data.eventWeekVoList
       })
     },
     initLineChart() {
@@ -161,7 +161,7 @@ export default {
           type: 'category',
           // data: ['2001', '2004', '2007', '2010', '2013', '2016', '2019', '2022']
           boundaryGap: false,
-          data: this.eventsYearDtoList.map(item => item.year)
+          data: this.eventWeekVoList.map(item => item.weekDay)
         },
         yAxis: {
           type: 'value'
@@ -174,7 +174,7 @@ export default {
         },
         series: [
           {
-            data: this.eventsYearDtoList.map(item => item.eventCount),
+            data: this.eventWeekVoList.map(item => item.totalReads),
             type: 'line',
             smooth: true,
             color: '#409EFF',

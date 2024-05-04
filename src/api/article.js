@@ -60,3 +60,57 @@ export function getCategoryCounts() {
     method: 'get'
   })
 }
+
+export function getArticlePageInfo(articlePageNum, queryKeyword) {
+  return request({
+    url: '/science-articles/getArticlePageInfo',
+    method: 'get',
+    params: { articlePageNum, queryKeyword }
+  })
+}
+
+export function getArticleHeat() {
+  return request({
+    url: '/science-articles/getArticleHeat',
+    method: 'get'
+  })
+}
+
+export function getArticleDetail(articleId, userName) {
+  return request({
+    url: '/science-articles/getArticleDetail',
+    method: 'get',
+    params: { articleId, userName }
+  })
+}
+
+export function increaseArticleViews(articleId) {
+  return request({
+    url: '/science-articles/increaseArticleViews',
+    method: 'post',
+    params: { articleId }
+  })
+}
+
+export function increaseArticleLikes(data) {
+  return request({
+    url: '/science-articles/increaseArticleLikes',
+    method: 'post',
+    data
+  })
+}
+
+export function decreaseArticleLikes(data) {
+  return request({
+    url: '/science-articles/decreaseArticleLikes',
+    method: 'post',
+    data
+  })
+}
+
+export function getHomeArticleInfo() {
+  return request({
+    url: '/science-articles/getHomeArticleInfo',
+    method: 'get'
+  })
+}

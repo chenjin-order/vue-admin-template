@@ -1,14 +1,21 @@
-import { deleteArticle, deleteBatchArticle, addArticle, editorArticle } from '@/api/article'
+import {
+  deleteArticle,
+  deleteBatchArticle,
+  addArticle,
+  editorArticle,
+  increaseArticleLikes,
+  decreaseArticleLikes,
+  increaseArticleViews
+} from '@/api/article'
 
 const state = {
-
 }
 
 const mutations = {
-
 }
 
 const actions = {
+
   // delete article
   deleteArticle({ commit }, articleId) {
     return new Promise((resolve, reject) => {
@@ -74,6 +81,39 @@ const actions = {
         articleCategoryId: articleCategoryId,
         articleCreatedAt: articleCreatedAt
       }).then(response => {
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // increase articleViews
+  increaseArticleViews({ commit }, articleId) {
+    return new Promise((resolve, reject) => {
+      increaseArticleViews(articleId).then(() => {
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // increase articleLikes
+  increaseArticleLikes({ commit }, likeData) {
+    return new Promise((resolve, reject) => {
+      increaseArticleLikes(likeData).then(() => {
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // increase articleLikes
+  decreaseArticleLikes({ commit }, likeData) {
+    return new Promise((resolve, reject) => {
+      decreaseArticleLikes(likeData).then(() => {
         resolve()
       }).catch(error => {
         reject(error)

@@ -21,12 +21,12 @@
           <span style="margin-left: 10px;"> {{ scope.row.responsesId }} </span>
         </template>
       </el-table-column>
-      <el-table-column prop="eventName" label="应对措施类型" align="center" width="250">
+      <el-table-column prop="eventName" label="灾害事件名称" align="center" width="250">
         <template slot-scope="scope">
           <span style="margin-left: 10px;"> {{ scope.row.eventName }} </span>
         </template>
       </el-table-column>
-      <el-table-column prop="typeName" label="灾害事件名称" align="center" width="220">
+      <el-table-column prop="typeName" label="应对措施类型" align="center" width="220">
         <template slot-scope="scope">
           <span style="margin-left: 10px;"> {{ scope.row.typeName }} </span>
         </template>

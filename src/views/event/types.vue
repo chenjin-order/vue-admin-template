@@ -25,7 +25,6 @@ export default {
   created: function() {
     getEventTypes().then((response) => {
       this.eventTypes = response.data.items
-      console.log(this.eventTypes)
     })
   }
 }
