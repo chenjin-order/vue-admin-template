@@ -43,7 +43,7 @@
                   <span>{{ item.eventName }}</span>
                 </div>
                 <el-row>
-                  <el-col :span="24" style="height: 140px;">
+                  <el-col :span="24" style="height: 150px;">
                     <div style="height: 100%;width: 100%;">
                       <el-image :src="item.eventImageUrl" fit="contain" lazy />
                     </div>
