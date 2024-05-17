@@ -5,22 +5,22 @@
         <el-table :data="eventTableData" border style="width: 100%;border-radius: 10px">
           <el-table-column label="灾害事件图文" width="873px">
             <template slot-scope="scope">
-              <el-card class="card-in-table" shadow="always" style="border-radius: 10px" @click.native.prevent="goToEventDetail(scope.row)">
+              <el-card class="card-in-table" shadow="always" style="border-radius: 10px">
                 <div slot="header" class="clearfix">
                   <el-row :gutter="10">
-                    <el-col :span="24"><span>{{ scope.row.eventName }}</span></el-col>
+                    <el-col :span="24"><span @click="goToEventDetail(scope.row)">{{ scope.row.eventName }}</span></el-col>
                   </el-row>
                 </div>
                 <el-row :gutter="30">
                   <el-col :span="6">
-                    <el-image :src="scope.row.eventImageUrl" lazy />
+                    <el-image :src="scope.row.eventImageUrl" lazy @click="goToEventDetail(scope.row)" />
                   </el-col>
                   <el-col :span="18">
                     <el-row>
-                      <el-col :span="24"><div class="limited-content" v-html="scope.row.eventDescription" /></el-col>
+                      <el-col :span="24"><div class="limited-content" @click="goToEventDetail(scope.row)" v-html="scope.row.eventDescription" /></el-col>
                     </el-row>
                     <el-row>
-                      <el-col :span="24"><el-button type="text">{{ scope.row.typeName }}</el-button></el-col>
+                      <el-col :span="24"><el-button type="text" @click="gotoEventType">{{ scope.row.typeName }}</el-button></el-col>
                     </el-row>
                     <el-row :gutter="20">
                       <el-col :span="18"><span>{{ scope.row.eventSource }}</span></el-col>
@@ -105,12 +105,21 @@ export default {
     })
   },
   methods: {
-    changePage(articlePageNum) {
-      if (articlePageNum) {
-        this.currentPage = articlePageNum
+    changePage(eventPageNum) {
+      if (eventPageNum) {
+        this.currentPage = eventPageNum
       }
+      console.log(this.currentPage)
       getEventPageInfo(this.currentPage, this.queryKeyword).then((response) => {
         this.eventTableData = response.data.items.records
+
+        this.total = response.data.items.total
+
+        this.pageSize = response.data.items.size
+
+        this.isShow = true
+
+        window.scrollTo(0, 0)
       })
     },
     getEventTypeCount() {
@@ -143,6 +152,9 @@ export default {
     },
     goToEventDetail(event) {
       this.$router.push(`/eventPage/detail/` + event.eventId)
+    },
+    gotoEventType() {
+      this.$router.push('/eventPage/type')
     }
   }
 }

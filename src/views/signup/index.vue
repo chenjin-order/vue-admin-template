@@ -323,6 +323,7 @@ $light_gray:#eee;
     padding: 160px 35px 0;
     margin: 0 auto;
     overflow: hidden;
+    padding: 100px 35px 0;
   }
 
   .tips {
@@ -354,6 +355,7 @@ $light_gray:#eee;
       margin: 0px auto 40px auto;
       text-align: center;
       font-weight: bold;
+      margin: 0px auto 20px auto;
     }
   }
 

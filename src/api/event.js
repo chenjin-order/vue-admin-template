@@ -68,10 +68,11 @@ export function getEventWeek() {
   })
 }
 
-export function getEventPageInfo() {
+export function getEventPageInfo(eventPageNum, queryKeyword) {
   return request({
     url: '/disaster-events/getEventPageInfo',
-    method: 'get'
+    method: 'get',
+    params: { eventPageNum, queryKeyword }
   })
 }
 
@@ -95,5 +96,12 @@ export function getHomeEventInfo(homeEventPageNum) {
     url: '/disaster-events/getHomeEventInfo',
     method: 'get',
     params: { homeEventPageNum }
+  })
+}
+
+export function getEventTypesInfo() {
+  return request({
+    url: '/disaster-event-types/getEventTypesInfo',
+    method: 'get'
   })
 }

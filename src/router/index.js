@@ -222,6 +222,16 @@ export const constantRoutes = [
           title: '灾害事件详情',
           userRole: ['user']
         }
+      },
+      {
+        path: 'type',
+        component: () => import('@/views/eventPage/type'),
+        hidden: true,
+        name: 'eventType',
+        meta: {
+          title: '灾害类型',
+          userRole: ['user']
+        }
       }
     ]
   }
@@ -452,7 +462,7 @@ export const asyncRoutes = [
     redirect: '/article/articleList',
     name: 'Article',
     meta: {
-      title: '文章管理',
+      title: '科普文章管理',
       icon: 'el-icon-document',
       userRole: ['admin', 'editor']
     },
@@ -496,7 +506,7 @@ export const asyncRoutes = [
     redirect: '/event/eventList',
     name: 'Event',
     meta: {
-      title: '事件管理',
+      title: '灾害事件管理',
       icon: 'el-icon-c-scale-to-original',
       userRole: ['admin', 'editor']
     },

@@ -38,13 +38,13 @@
         >
           <el-row :gutter="20">
             <el-col v-for="(item, index) in eventData" :key="index" :span="5">
-              <el-card class="box-card" @click.native.prevent="goToEventDetail(item.eventId)">
-                <div slot="header" class="clearfix">
+              <el-card class="box-card" >
+                <div slot="header" class="clearfix" @click="goToEventDetail(item.eventId)">
                   <span>{{ item.eventName }}</span>
                 </div>
                 <el-row>
                   <el-col :span="24" style="height: 150px;">
-                    <div style="height: 100%;width: 100%;">
+                    <div style="height: 100%;width: 100%;" @click="goToEventDetail(item.eventId)">
                       <el-image :src="item.eventImageUrl" fit="contain" lazy />
                     </div>
                   </el-col>
@@ -54,10 +54,12 @@
                     <el-row>
                       <el-col :span="17">
                         <span class="small-font">
-                          {{ item.typeName }}
+                          <el-button type="text" class="small-font-button" @click="gotoEventType">
+                            {{ item.typeName }}
+                          </el-button>
                         </span>
                       </el-col>
-                      <el-col :span="7" class="small-font">{{ item.eventEndDate }}</el-col>
+                      <el-col :span="7" class="small-font" @click="goToEventDetail(item.eventId)">{{ item.eventEndDate }}</el-col>
                     </el-row>
                   </el-col>
                 </el-row>
@@ -149,6 +151,9 @@ export default {
     },
     goToEventDetail(eventId) {
       this.$router.push(`/eventPage/detail/` + eventId)
+    },
+    gotoEventType() {
+      this.$router.push('/eventPage/type')
     }
   }
 }
@@ -217,7 +222,14 @@ export default {
   }
   .small-font{
     font-size: 12px;
+    line-height: 1.5;
   }
+  .small-font-button {
+  padding: 0 5px; /* 调整内边距以适应您的需求 */
+  line-height: 1.5; /* 确保与文本元素相同的行高 */
+  border: none; /* 去除边框，如果有的话 */
+  /* 其他您可能需要的样式... */
+}
   .limited-content::after {
     content: '';
     position: absolute;

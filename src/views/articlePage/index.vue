@@ -131,7 +131,22 @@ export default {
         this.currentPage = articlePageNum
       }
       getArticlePageInfo(this.currentPage, this.queryKeyword).then((response) => {
-        this.articleTableData = response.data.items.records
+        const newArticles = response.data.items.records.map(article => {
+          const newArticle = { ...article }
+          newArticle.articleCreatedAt = this.formatDateWithSeconds(new Date(newArticle.articleCreatedAt))
+          newArticle.articleUpdatedAt = this.formatDateWithSeconds(new Date(newArticle.articleUpdatedAt))
+          return newArticle
+        })
+
+        this.articleTableData = newArticles
+
+        this.total = response.data.items.total
+
+        this.pageSize = response.data.items.size
+
+        this.isShow = true
+
+        window.scrollTo(0, 0)
       })
     },
     goToArticleDetail(article) {
